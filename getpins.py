@@ -258,7 +258,7 @@ def get_custom_pins(chip, og_file):
     realpath = os.path.realpath(og_file.name)
     path = os.path.dirname(realpath) + "/"
     chip_file = "{}.hdl".format(chip['name'])
-    if chip_file in glob.glob(path + "*.hdl"):
+    if chip_file in glob.glob(path + chip_file):
         hdl = open(chip_file, "r").read()
         json_data = parse_hdl(hdl)
         return (json_data['inputs'], json_data['outputs'])
