@@ -257,12 +257,14 @@ def Or_pins():
 def get_custom_pins(chip, og_file):
     realpath = os.path.realpath(og_file.name)
     path = os.path.dirname(realpath) + "/"
-    chip_file = "{}.hdl".format(chip['name'])
-    if chip_file in glob.glob(path + chip_file):
+    chip_file = path + "{}.hdl".format(chip['name'])
+    
+    try:
         hdl = open(chip_file, "r").read()
         json_data = parse_hdl(hdl)
         return (json_data['inputs'], json_data['outputs'])
-    else:
+    except IOError as e:
+	print(e)
         return (None, None)
 
 
