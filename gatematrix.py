@@ -20,27 +20,12 @@ def gate_matrix(path):
     num_chips = len(phdl["parts"])
     for i in range(0, num_chips):
         input_arr, output_arr = getpins.get_pins(phdl["parts"][i], og_file)
-        names = []
 
-        # Determines split pins
+        # Adds inout to each pin and wire
         for j in range(0, len(phdl["parts"][i]["internal"])):
-            names.append(phdl["parts"][i]["internal"][j]["name"])
-        seen = set()
-        duplicates = list(set(x for x in names if x in seen or seen.add(x)))
-
-        # Adds inout and split to each pin and wire
-        for j in range(0, len(phdl["parts"][i]["internal"])):
-
-            if phdl["parts"][i]["internal"][j]["name"] in duplicates:
-                phdl["parts"][i]["internal"][j]["split"] = True
-            else:
-                phdl["parts"][i]["internal"][j]["split"] = False
-
             found = False
-            ind = -1
             for l in range(0, len(input_arr)):
                 if phdl["parts"][i]["internal"][j]["name"] == input_arr[l]["name"]:
-                    ind = l
                     found = True
                     break
             if found:
@@ -49,32 +34,6 @@ def gate_matrix(path):
             else:
                 phdl["parts"][i]["internal"][j]["inout"] = "out"
                 phdl["parts"][i]["external"][j]["inout"] = "out"
-
-                found2 = False
-                for m in range(0, len(output_arr)):
-                    if phdl["parts"][i]["internal"][j]["name"] == output_arr[m]["name"]:
-                        ind = m
-                        found2 = True
-                        break
-
-            # fixes start and end of each pin and wire and adds size to each wire
-            if not phdl["parts"][i]["internal"][j]["split"]:
-                if phdl["parts"][i]["internal"][j]["inout"] == "in":
-                    phdl["parts"][i]["internal"][j]["end"] = input_arr[ind]["end"] - 1
-                else:
-                    phdl["parts"][i]["internal"][j]["end"] = output_arr[ind]["end"] - 1
-
-            if phdl["parts"][i]["external"][j]["end"] > 0:
-                start = phdl["parts"][i]["external"][j]["start"]
-                end = phdl["parts"][i]["external"][j]["end"]
-                size = end - start
-                phdl["parts"][i]["external"][j]["size"] = size
-            else:
-                start = phdl["parts"][i]["internal"][j]["start"]
-                end = phdl["parts"][i]["internal"][j]["end"]
-                size = end - start
-                phdl["parts"][i]["external"][j]["end"] = size
-                phdl["parts"][i]["external"][j]["size"] = size
 
     # Creates large matrix
     # values are indices of phdl["parts"] array
@@ -138,4 +97,4 @@ def gate_matrix(path):
             lm[j][i] = -1
             lm[j+shift][i] = temp
 
-    return phdl, lm
+    return lm, phdl
