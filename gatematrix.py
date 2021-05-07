@@ -16,17 +16,30 @@ def gate_matrix(path):
     og_file = open(path, "r")
     phdl = parse_hdl(og_file.read())
 
+    # adjust pins of overall chip
+    for i in phdl["inputs"]:
+        if i["end"] != 0:
+            i["start"] = 0
+            i["end"] = i["end"] - 1
+
+    for i in phdl["outputs"]:
+        if i["end"] != 0:
+            i["start"] = 0
+            i["end"] = i["end"] - 1
+
     # phdl["parts"] is an array of internal chip dictionaries
     num_chips = len(phdl["parts"])
     for i in range(0, num_chips):
         input_arr, output_arr = getpins.get_pins(phdl["parts"][i], og_file)
 
+        ind = -1
         # Adds inout to each pin and wire
         for j in range(0, len(phdl["parts"][i]["internal"])):
             found = False
             for l in range(0, len(input_arr)):
                 if phdl["parts"][i]["internal"][j]["name"] == input_arr[l]["name"]:
                     found = True
+                    ind = l
                     break
             if found:
                 phdl["parts"][i]["internal"][j]["inout"] = "in"
@@ -34,6 +47,38 @@ def gate_matrix(path):
             else:
                 phdl["parts"][i]["internal"][j]["inout"] = "out"
                 phdl["parts"][i]["external"][j]["inout"] = "out"
+
+                for m in range(0, len(output_arr)):
+                    if phdl["parts"][i]["internal"][j]["name"] == output_arr[m]["name"]:
+                        ind = m
+                        break
+
+            # fixes start and end of wires and pins
+            if phdl["parts"][i]["internal"][j]["end"] == -1:
+                phdl["parts"][i]["internal"][j]["spec_by_user"] = False
+                phdl["parts"][i]["internal"][j]["start"] = 0
+                if phdl["parts"][i]["internal"][j]["inout"] == "in":
+                    if input_arr[ind]["end"] == 0:
+                        phdl["parts"][i]["internal"][j]["end"] = input_arr[ind]["end"]
+                    else:
+                        phdl["parts"][i]["internal"][j]["end"] = input_arr[ind]["end"] - 1
+                else:
+                    if output_arr[ind]["end"] == 0:
+                        phdl["parts"][i]["internal"][j]["end"] = output_arr[ind]["end"]
+                    else:
+                        phdl["parts"][i]["internal"][j]["end"] = output_arr[ind]["end"] - 1
+            else:
+                phdl["parts"][i]["internal"][j]["spec_by_user"] = True
+
+            if phdl["parts"][i]["external"][j]["end"] == -1:
+                phdl["parts"][i]["external"][j]["start"] = 0
+                stop = phdl["parts"][i]["internal"][j]["end"]
+                begin = phdl["parts"][i]["internal"][j]["start"]
+                size = stop - begin
+                phdl["parts"][i]["external"][j]["end"] = size
+                phdl["parts"][i]["external"][j]["spec_by_user"] = False
+            else:
+                phdl["parts"][i]["external"][j]["spec_by_user"] = True
 
     # Creates large matrix
     # values are indices of phdl["parts"] array
