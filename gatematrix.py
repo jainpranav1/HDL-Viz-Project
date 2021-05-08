@@ -7,6 +7,7 @@ import numpy as np
 # returns a gate matrix (numpy array) and parsed hdl file
 # the gate matrix contains indices referring to parsed hdl file's "parts" array
 # example
+#   import gatematrix as gm
 #   path = r"C:\Users\prana\Desktop\hdl_direc\LogicGate2.hdl"
 #   phdl, gmatrix = gm.gate_matrix(path)
 # gmatrix's indices refer to elements in phdl["parts"]
