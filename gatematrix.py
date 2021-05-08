@@ -103,9 +103,8 @@ def gate_matrix(path, max_to_col):
                     break
             if found:
                 ind_rem.append(i)
-                row = 2 * nxt_row + 1
                 col = -1
-                matrix_data.append([row, col, i])
+                matrix_data.append([nxt_row, col, i])
                 nxt_row += 1
                 for lead in chip["external"]:
                     if lead["inout"] == "out":
@@ -120,7 +119,7 @@ def gate_matrix(path, max_to_col):
     max_row2 = -1
     max_col2 = -1
     for m in range(0, len(matrix_data)):
-        matrix_data[m][0] = matrix_data[m][0] % (2 * max_to_col)
+        matrix_data[m][0] = 2 * (matrix_data[m][0] % max_to_col) + 1
         if matrix_data[m][0] == 1:
             col += 2
         matrix_data[m][1] = col
