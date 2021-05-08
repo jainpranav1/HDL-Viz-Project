@@ -67,6 +67,25 @@ def gate_data(path, max_to_col):
     for p in phdl["outputs"]:
         ov_out.append(p["name"])
 
+    # list of overall chip's inputs
+    ov_in = []
+    for p in phdl["inputs"]:
+        ov_in.append(p["name"])
+
+    # adds "overall" information to wires (determines whether connected to outer pin)
+    for p in phdl["parts"]:
+        for k in p["external"]:
+            if k["inout"] == "in":
+                if k["name"] in ov_in:
+                    k["overall"] = "in"
+                else:
+                    k["overall"] = "none"
+            else:
+                if k["name"] in ov_out:
+                    k["overall"] = "out"
+                else:
+                    k["overall"] = "none"
+
     end_dic = {}
     # stores end points on end_dic dictionary
     for p in phdl["parts"]:
