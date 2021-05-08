@@ -103,7 +103,7 @@ def gate_data(path, max_to_col):
     for p in phdl["parts"]:
         wm[p["coord"][0]][p["coord"][1]] = -1
         for k in p["external"]:
-            if (k["inout"] == "out") and (k["name"] not in ov_out):
+            if (k["inout"] == "out") and (k["overall"] == "none"):
                 for end in end_dic[k["name"]]:
                     new_start = sum1(p["coord"], [0, 1])
                     new_end = sum1(end, [0, -1])
