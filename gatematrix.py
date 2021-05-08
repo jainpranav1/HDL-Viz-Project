@@ -3,17 +3,17 @@ import getpins
 import numpy as np
 
 # the gate_matrix function
-# takes a path to an hdl file
+# takes a path to an hdl file and max number of gates in column
 # returns a gate matrix (numpy array) and parsed hdl file
 # the gate matrix contains indices referring to parsed hdl file's "parts" array
 # example
 #   import gatematrix as gm
 #   path = r"C:\Users\prana\Desktop\hdl_direc\LogicGate2.hdl"
-#   phdl, gmatrix = gm.gate_matrix(path)
+#   phdl, gmatrix = gm.gate_matrix(path, max_to_col)
 # gmatrix's indices refer to elements in phdl["parts"]
 
 
-def gate_matrix(path):
+def gate_matrix(path, max_to_col):
     og_file = open(path, "r")
     phdl = parse_hdl(og_file.read())
 
@@ -90,8 +90,6 @@ def gate_matrix(path):
         prv_outs.append(i["name"])
 
     unused_ind = list(range(0, num_chips))
-    max_row = -1
-    max_col = -1
     for k in range(0, num_chips):
         nxt_outs = []
         nxt_row = 0
@@ -106,12 +104,8 @@ def gate_matrix(path):
             if found:
                 ind_rem.append(i)
                 row = 2 * nxt_row + 1
-                col = 2 * k + 1
+                col = -1
                 matrix_data.append([row, col, i])
-                if row > max_row:
-                    max_row = row
-                if col > max_col:
-                    max_col = col
                 nxt_row += 1
                 for lead in chip["external"]:
                     if lead["inout"] == "out":
@@ -121,8 +115,22 @@ def gate_matrix(path):
             unused_ind.remove(i)
         prv_outs = nxt_outs
 
-    lm_row = max_row + 2
-    lm_col = max_col + 2
+    # edit matrix data to limit number of gates in each column
+    col = -1
+    max_row2 = -1
+    max_col2 = -1
+    for m in range(0, len(matrix_data)):
+        matrix_data[m][0] = matrix_data[m][0] % (2 * max_to_col)
+        if matrix_data[m][0] == 1:
+            col += 2
+        matrix_data[m][1] = col
+        if matrix_data[m][0] > max_row2:
+            max_row2 = matrix_data[m][0]
+        if matrix_data[m][1] > max_col2:
+            max_col2 = matrix_data[m][1]
+
+    lm_row = max_row2 + 2
+    lm_col = max_col2 + 2
     lm = np.zeros([lm_row, lm_col]) - 1
     for val in matrix_data:
         lm[val[0], val[1]] = val[2]
