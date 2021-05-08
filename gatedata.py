@@ -46,18 +46,18 @@ def short_path(start, end, matrix):
     return coordinates
 
 # the gate_data function
-# takes a path to an hdl file
+# takes a path to an hdl file and max number of gates in column
 # returns a gate matrix (numpy array), a wire matrix, and the hdl file data
 # the gate matrix contains indices referring to the hdl file's "parts" array
 # the wire matrix contains counts of the number of wires in each cell of gate matrix
 # example
 #   import gatedata as gd
 #   path = r"C:\Users\prana\Desktop\hdl_direc\LogicGate2.hdl"
-#   gmatrix, wmatrix, phdl = gd.gate_data(path)
+#   gmatrix, wmatrix, phdl = gd.gate_data(path, max_to_col)
 # gmatrix's indices refer to elements in phdl["parts"]
 
-def gate_data(path):
-    gmatrix, phdl = gm.gate_matrix(path)
+def gate_data(path, max_to_col):
+    gmatrix, phdl = gm.gate_matrix(path, max_to_col)
 
     num_rows = len(gmatrix)
     num_cols = len(gmatrix[0])
