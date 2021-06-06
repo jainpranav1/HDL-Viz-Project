@@ -2,7 +2,7 @@ import schemdraw.elements as elm
 from schemdraw.logic import *
 
 def ov_pin_spacing(pins):
-    spacing = 1.4
+    spacing = 1.5
     for i in pins:
         if (i != "---"):
             return spacing
@@ -65,20 +65,19 @@ def generic_gate_maker(name, input_pins, output_pins, ov_input, ov_output, in_pi
             pins.append(elm.IcPin(name=short_output_pins[j], pin=str(out_pin_sizes[j]), side="right"))
     pins.reverse()
     max_pins = max([num_inputs, num_outputs])
-    gate = elm.Ic(pins=pins, size=[2*label_width, 0.8 * max_pins], edgepadH=0.05, plblsize=11, plblofst=0.1).label(name, "top", fontsize=11)
 
-    # pins are 0.5, top label is 0.5
-    horiz_padding = 0.1
-    top_padding = 0.5
-    bottom_padding = 0.1
+    pin_hei = 0.6
+    gate = elm.Ic(pins=pins, size=[2*label_width, pin_hei * (max_pins + 1)], edgepadH=pin_hei/2, plblsize=11, plblofst=0.1).label(name, "top", ofst=[0, -0.35], fontsize=11)
+
+    # pins are 0.5 (width)
 
     left_spacing = ov_pin_spacing(ov_input)
     right_spacing = ov_pin_spacing(ov_output)
 
-    size_bbox = [2*label_width + 1 + (2*horiz_padding) + left_spacing + right_spacing, (0.8 * max_pins) + top_padding + bottom_padding]
+    size_bbox = [2*label_width + 1 + left_spacing + right_spacing, pin_hei * (max_pins + 1)]
 
     # coordinates of gate relative to bbox
-    rel_coor = [horiz_padding + 0.5 + left_spacing, bottom_padding]
+    rel_coor = [0.5 + left_spacing, 0]
 
     # adds overall inputs and outputs
     for i in range(0, num_inputs):
@@ -100,8 +99,6 @@ def mux_dmux(dmux, input_pins, output_pins, ov_input, ov_output):
     # pins are 0.5
     # width of gate box is 1.25
     # height of gate box is 1.25; triangles height is 0.47; from origin to top is 2
-    vert_padding = 0.1
-    horiz_padding = 0.1
 
     right_spacing = ov_pin_spacing(ov_output)
 
@@ -115,13 +112,13 @@ def mux_dmux(dmux, input_pins, output_pins, ov_input, ov_output):
     top_spacing = 0
     for i in range(0, num_inputs):
         if (ov_input[i] != "---") and (input_pins[i] == "sel"):
-            top_spacing += 0.5
+            top_spacing += 0.45
             break
 
-    size_bbox = [(2*horiz_padding) + 2.25 + right_spacing + left_spacing, (2*vert_padding) + 2.47 + top_spacing]
+    size_bbox = [2.25 + right_spacing + left_spacing, 2.47 + top_spacing]
 
     # coordinates of gate relative to bbox
-    rel_coor = [horiz_padding + 0.5 + left_spacing, vert_padding + 0.47]
+    rel_coor = [0.5 + left_spacing, + 0.47]
 
     for i in input_pins:
         if "sel" in i:
@@ -160,43 +157,41 @@ def elem_gate_maker(name, input_pins, ov_input, ov_output):
 
     # height of gates is 1
     # width of gates varies
-    vert_padding = 0.1
-    horiz_padding = 0.1
 
     left_spacing = ov_pin_spacing(ov_input)
     right_spacing = ov_pin_spacing(ov_output)
 
-    bbox_height = 1 + (2*vert_padding)
+    bbox_height = 1
 
     # coordinates of gate relative to bbox
-    rel_coor = [horiz_padding + left_spacing, bbox_height/2]
+    rel_coor = [left_spacing, bbox_height/2]
 
     # creates gate
     if name == "Or":
         gate = logic.Or(inputs=num_in)
-        bbox_width = 1.95 + (2 * horiz_padding) + left_spacing + right_spacing
+        bbox_width = 1.95 + left_spacing + right_spacing
     elif name == "Nor":
         gate = logic.Nor(inputs=num_in)
-        bbox_width = 1.95 + (2 * horiz_padding) + left_spacing + right_spacing
+        bbox_width = 1.95 + left_spacing + right_spacing
     elif name == "And":
         gate = logic.And(inputs=num_in)
-        bbox_width = 1.9 + (2 * horiz_padding) + left_spacing + right_spacing
+        bbox_width = 1.9 + left_spacing + right_spacing
     elif name == "Nand":
         gate = logic.Nand(inputs=num_in)
-        bbox_width = 1.9 + (2 * horiz_padding) + left_spacing + right_spacing
+        bbox_width = 1.9 + left_spacing + right_spacing
     elif name == "Xor":
         gate = logic.Xor(inputs=num_in)
-        bbox_width = 2.1 + (2 * horiz_padding) + left_spacing + right_spacing
+        bbox_width = 2.1 + left_spacing + right_spacing
     elif name == "Xnor":
         gate = logic.Xnor(inputs=num_in)
-        bbox_width = 2.1 + (2 * horiz_padding) + left_spacing + right_spacing
+        bbox_width = 2.1 + left_spacing + right_spacing
     else:
         gate = logic.Not()
         if short_ov_input[0] != "---":
             gate.label(short_ov_input[0], loc="in", ofst=[-1, -0.1], fontsize=11, halign="right")
         if short_ov_output[0] != "---":
             gate.label(short_ov_output[0], loc="out", ofst=[1, -0.1], fontsize=11, halign="left")
-        bbox_width = 3 + (2 * horiz_padding) + left_spacing + right_spacing
+        bbox_width = 3 + left_spacing + right_spacing
         return gate, [bbox_width, bbox_height], rel_coor
 
     # label's gate's pins
