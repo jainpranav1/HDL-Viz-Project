@@ -276,8 +276,3 @@ def gate_info(phdl):
         gate["gate"] = chip
         gate["bbox_size"] = bbox_size
         gate["rel_coor"] = rel_coor
-
-path = r"C:\Users\prana\Desktop\hdl_direc\LogicGate2.hdl"
-gmatrix, wmatrix, phdl = gd.gate_data(path, 5)
-gate_info(phdl)
-print(phdl)
