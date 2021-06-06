@@ -102,18 +102,21 @@ def gate_data(path, max_to_col):
     # adds coordinates for each wire
     for p in phdl["parts"]:
         wm[p["coord"][0]][p["coord"][1]] = -1
-        for k in p["external"]:
-            if (k["inout"] == "out") and (k["overall"] == "none"):
-                for end in end_dic[k["name"]]:
+        for k in range(0, len(p["external"])):
+            if (p["external"][k]["inout"] == "out") and (p["external"][k]["overall"] == "none"):
+                for end in end_dic[p["external"][k]["name"]]:
                     new_start = sum1(p["coord"], [0, 1])
-                    new_end = sum1(end, [0, -1])
+                    if ((p["name"] == "mux") or (p["name"] == "dmux")) and (p["internal"][k]["name"] == "sel"):
+                        new_end = sum1(end, [-1, 0])
+                    else:
+                        new_end = sum1(end, [0, -1])
                     path = short_path(new_start, new_end, gmatrix)
                     for b in path:
                         wm[b[0]][b[1]] += 1
                     path.append(end)
-                    if "path" in k:
-                        k["path"].append(path)
+                    if "path" in p["external"][k]:
+                        p["external"][k]["path"].append(path)
                     else:
-                        k["path"] = [path]
+                        p["external"][k]["path"] = [path]
 
     return gmatrix, wm, phdl
