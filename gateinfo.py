@@ -1,7 +1,4 @@
-import gatedata as gd
-import schemdraw
 import schemdraw.elements as elm
-from schemdraw.segments import *
 from schemdraw.logic import *
 
 def ov_pin_spacing(pins):
@@ -13,24 +10,37 @@ def ov_pin_spacing(pins):
 
 def shorten_pins(pins):
     short_pins = []
-    max_length_1 = 3
-    max_length_2 = 6
+
+    # start and end present
+    max_length_se = 3
+
+    # start present
+    max_length_s = 4
+
+    # none present
+    max_length_n = 6
+
     for p in pins:
         ind = p.find("[")
 
-        # if [ is present (ex. in[0:3]
+        if ":" in p:
+            max_length = max_length_se
+        else:
+            max_length = max_length_s
+
         if ind != -1:
             name = p[0:ind]
-            if len(name) > max_length_1:
-                short_pins.append(p[0:(max_length_1-1)] + "..." + p[ind:])
+            if len(name) > max_length:
+                short_pins.append(p[0:(max_length-1)] + "..." + p[ind:])
             else:
                 short_pins.append(p)
 
         else:
-            if len(p) > max_length_2:
-                short_pins.append(p[0:(max_length_2-1)] + "...")
+            if len(p) > max_length_n:
+                short_pins.append(p[0:(max_length_n-1)] + "...")
             else:
                 short_pins.append(p)
+
     return short_pins
 
 def generic_gate_maker(name, input_pins, output_pins, ov_input, ov_output, in_pin_sizes, out_pin_sizes):
@@ -214,7 +224,6 @@ def elem_gate_maker(name, input_pins, ov_input, ov_output):
 # adds gate information to phdl dictionary
 
 def gate_info(phdl):
-
     elem_gates = ["And", "Nand", "Or", "Nor", "Xor", "Xnor", "Not"]
 
     for gate in phdl["parts"]:
@@ -229,14 +238,20 @@ def gate_info(phdl):
                 if not i["spec_by_user"]:
                     input_pins.append(i["name"])
                 else:
-                    input_pins.append(i["name"] + "[" + str(i["start"]) + ":" + str(i["end"]) + "]")
+                    if i["start"] != i["end"]:
+                        input_pins.append(i["name"] + "[" + str(i["start"]) + ":" + str(i["end"]) + "]")
+                    else:
+                        input_pins.append(i["name"] + "[" + str(i["start"]) + "]")
 
             else:
                 out_pin_sizes.append(i["end"] - i["start"] + 1)
                 if not i["spec_by_user"]:
                     output_pins.append(i["name"])
                 else:
-                    output_pins.append(i["name"] + "[" + str(i["start"]) + ":" + str(i["end"]) + "]")
+                    if i["start"] != i["end"]:
+                        output_pins.append(i["name"] + "[" + str(i["start"]) + ":" + str(i["end"]) + "]")
+                    else:
+                        output_pins.append(i["name"] + "[" + str(i["start"]) + "]")
 
         # gets overall input wire information (and true or false inputs)
         ov_input = []
@@ -248,7 +263,10 @@ def gate_info(phdl):
                     if not i["spec_by_user"]:
                         ov_input.append(i["name"])
                     else:
-                        ov_input.append(i["name"] + "[" + str(i["start"]) + ":" + str(i["end"]) + "]")
+                        if i["start"] != i["end"]:
+                            ov_input.append(i["name"] + "[" + str(i["start"]) + ":" + str(i["end"]) + "]")
+                        else:
+                            ov_input.append(i["name"] + "[" + str(i["start"]) + "]")
                 else:
                     ov_input.append("---")
 
@@ -260,7 +278,10 @@ def gate_info(phdl):
                     if not i["spec_by_user"]:
                         ov_output.append(i["name"])
                     else:
-                        ov_output.append(i["name"] + "[" + str(i["start"]) + ":" + str(i["end"]) + "]")
+                        if i["start"] != i["end"]:
+                            ov_output.append(i["name"] + "[" + str(i["start"]) + ":" + str(i["end"]) + "]")
+                        else:
+                            ov_output.append(i["name"] + "[" + str(i["start"]) + "]")
                 else:
                     ov_output.append("---")
 
