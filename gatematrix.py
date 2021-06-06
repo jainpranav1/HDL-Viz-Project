@@ -19,14 +19,20 @@ def gate_matrix(path, max_to_col):
 
     # adjust pins of overall chip
     for i in phdl["inputs"]:
-        if i["end"] != 0:
+        if i["end"] != -1:
             i["start"] = 0
             i["end"] = i["end"] - 1
+        else:
+            i["start"] = 0
+            i["end"] = 0
 
     for i in phdl["outputs"]:
         if i["end"] != 0:
             i["start"] = 0
             i["end"] = i["end"] - 1
+        else:
+            i["start"] = 0
+            i["end"] = 0
 
     # phdl["parts"] is an array of internal chip dictionaries
     num_chips = len(phdl["parts"])
@@ -59,13 +65,13 @@ def gate_matrix(path, max_to_col):
                 phdl["parts"][i]["internal"][j]["spec_by_user"] = False
                 phdl["parts"][i]["internal"][j]["start"] = 0
                 if phdl["parts"][i]["internal"][j]["inout"] == "in":
-                    if input_arr[ind]["end"] == 0:
-                        phdl["parts"][i]["internal"][j]["end"] = input_arr[ind]["end"]
+                    if (input_arr[ind]["end"] == 0) or (input_arr[ind]["end"] == -1):
+                        phdl["parts"][i]["internal"][j]["end"] = 0
                     else:
                         phdl["parts"][i]["internal"][j]["end"] = input_arr[ind]["end"] - 1
                 else:
-                    if output_arr[ind]["end"] == 0:
-                        phdl["parts"][i]["internal"][j]["end"] = output_arr[ind]["end"]
+                    if (output_arr[ind]["end"] == 0) or (output_arr[ind]["end"] == -1):
+                        phdl["parts"][i]["internal"][j]["end"] = 0
                     else:
                         phdl["parts"][i]["internal"][j]["end"] = output_arr[ind]["end"] - 1
             else:
