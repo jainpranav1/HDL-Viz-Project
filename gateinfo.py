@@ -1,8 +1,8 @@
 import schemdraw.elements as elm
 from schemdraw.logic import *
 
-def ov_pin_spacing(pins, num_wires):
-    if num_wires == 0:
+def ov_pin_spacing(pins, no_spacing):
+    if no_spacing:
         return 0
     spacing = 1.25
     for i in pins:
@@ -45,7 +45,7 @@ def shorten_pins(pins):
 
     return short_pins
 
-def generic_gate_maker(name, input_pins, output_pins, ov_input, ov_output, in_pin_sizes, out_pin_sizes, num_wires_before, num_wires_after):
+def generic_gate_maker(name, input_pins, output_pins, ov_input, ov_output, in_pin_sizes, out_pin_sizes, no_spacing_before, no_spacing_after):
     pins = []
     short_input_pins = shorten_pins(input_pins)
     short_output_pins = shorten_pins(output_pins)
@@ -72,8 +72,8 @@ def generic_gate_maker(name, input_pins, output_pins, ov_input, ov_output, in_pi
     gate = elm.Ic(pins=pins, size=[2*label_width, pin_hei * (max_pins + 1)], edgepadH=pin_hei/2, plblsize=11, plblofst=0.1).label(name, "top", ofst=[0, -0.35], fontsize=11)
     # pins are 0.5 (width)
 
-    left_spacing = ov_pin_spacing(ov_input, num_wires_before)
-    right_spacing = ov_pin_spacing(ov_output, num_wires_after)
+    left_spacing = ov_pin_spacing(ov_input, no_spacing_before)
+    right_spacing = ov_pin_spacing(ov_output, no_spacing_after)
 
     size_bbox = [2*label_width + 1 + left_spacing + right_spacing, pin_hei * (max_pins + 1)]
 
@@ -90,7 +90,7 @@ def generic_gate_maker(name, input_pins, output_pins, ov_input, ov_output, in_pi
 
     return gate, size_bbox, rel_coor
 
-def mux_dmux(dmux, input_pins, output_pins, ov_input, ov_output, num_wires_before, num_wires_after):
+def mux_dmux(dmux, input_pins, output_pins, ov_input, ov_output, no_spacing_before, no_spacing_after):
     pins = []
     short_ov_input = shorten_pins(ov_input)
     short_ov_output = shorten_pins(ov_output)
@@ -101,14 +101,14 @@ def mux_dmux(dmux, input_pins, output_pins, ov_input, ov_output, num_wires_befor
     # width of gate box is 1.25
     # height of gate box is 1.25; triangles height is 0.47; from origin to top is 2
 
-    right_spacing = ov_pin_spacing(ov_output, num_wires_after)
+    right_spacing = ov_pin_spacing(ov_output, no_spacing_after)
 
     # adds spacing in case their are overall inputs / outputs
     left_spacing = 0
-    if num_wires_before != 0:
+    if not no_spacing_before:
         for i in range(0, num_inputs):
             if (ov_input[i] != "---") and (input_pins[i] != "sel"):
-                left_spacing += 1.4
+                left_spacing += 1.25
                 break
 
     top_spacing = 0
@@ -151,7 +151,7 @@ def mux_dmux(dmux, input_pins, output_pins, ov_input, ov_output, num_wires_befor
 
     return gate, size_bbox, rel_coor
 
-def elem_gate_maker(name, input_pins, ov_input, ov_output, num_wires_before, num_wires_after):
+def elem_gate_maker(name, input_pins, ov_input, ov_output, no_spacing_before, no_spacing_after):
     short_ov_input = shorten_pins(ov_input)
     short_ov_output = shorten_pins(ov_output)
 
@@ -160,8 +160,8 @@ def elem_gate_maker(name, input_pins, ov_input, ov_output, num_wires_before, num
     # height of gates is 1
     # width of gates varies
 
-    left_spacing = ov_pin_spacing(ov_input, num_wires_before)
-    right_spacing = ov_pin_spacing(ov_output, num_wires_after)
+    left_spacing = ov_pin_spacing(ov_input, no_spacing_before)
+    right_spacing = ov_pin_spacing(ov_output, no_spacing_after)
 
     bbox_height = 1
 
@@ -309,18 +309,23 @@ def gate_info(gmatrix, wmatrix, phdl):
                     ov_output.append("---")
 
         [x, y] = gate["coord"]
-        num_wires_before = wmatrix[x][y-1]
-        num_wires_after = wmatrix[x][y+1]
+        no_spacing_before = False
+        if wmatrix[x][y-1] == 0 and y == 1:
+            no_spacing_before = True
+
+        no_spacing_after = False
+        if wmatrix[x][y+1] == 0 and y == len(wmatrix[0]) - 2:
+            no_spacing_after = True
 
         # gate maker
         if gate["name"] in elem_gates:
-            chip, bbox_size, rel_coor = elem_gate_maker(gate["name"], input_pins, ov_input, ov_output, num_wires_before, num_wires_after)
+            chip, bbox_size, rel_coor = elem_gate_maker(gate["name"], input_pins, ov_input, ov_output, no_spacing_before, no_spacing_after)
         elif gate["name"] == "Mux":
-            chip, bbox_size, rel_coor = mux_dmux(False, input_pins, output_pins, ov_input, ov_output, num_wires_before, num_wires_after)
+            chip, bbox_size, rel_coor = mux_dmux(False, input_pins, output_pins, ov_input, ov_output, no_spacing_before, no_spacing_after)
         elif gate["name"] == "DMux":
-            chip, bbox_size, rel_coor = mux_dmux(True, input_pins, output_pins, ov_input, ov_output, num_wires_before, num_wires_after)
+            chip, bbox_size, rel_coor = mux_dmux(True, input_pins, output_pins, ov_input, ov_output, no_spacing_before, no_spacing_after)
         else:
-            chip, bbox_size, rel_coor = generic_gate_maker(gate["name"], input_pins, output_pins, ov_input, ov_output, in_pin_sizes, out_pin_sizes, num_wires_before, num_wires_after)
+            chip, bbox_size, rel_coor = generic_gate_maker(gate["name"], input_pins, output_pins, ov_input, ov_output, in_pin_sizes, out_pin_sizes, no_spacing_before, no_spacing_after)
 
         # adds to phdl["parts"] dictionary
         gate["gate"] = chip
