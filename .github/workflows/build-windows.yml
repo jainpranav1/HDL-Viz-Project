@@ -34,7 +34,7 @@ jobs:
           pip install cffi maturin cx_freeze==6.8b3 schemdraw numpy
       - name: py-install
         run: |
-          maturin build --manifest-path parse/Cargo.toml --release --interpreter python3.9
+          maturin build --manifest-path parse/Cargo.toml --release
           ls parse/target/wheels
           ls parse/target/release
       - name: install built parser
