@@ -46,6 +46,8 @@ jobs:
         with:
           name: cli-linux
           path: viz/dist
+      - name: test for 0 return
+        run: viz/dist/cli
   build_osx:
     runs-on: macOS-latest
     steps:
@@ -89,6 +91,8 @@ jobs:
         with:
           name: cli-osx
           path: viz/dist
+      - name: test for 0 return
+        run: viz/dist/cli
   build_windows:
     runs-on: windows-latest
     steps:
@@ -131,3 +135,5 @@ jobs:
         with:
           name: cli-windows
           path: viz/dist
+      - name: test for 0 return
+        run: viz/dist/cli.exe
