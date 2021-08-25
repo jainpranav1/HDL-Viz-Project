@@ -18,7 +18,7 @@ jobs:
           ref: pyo3
           path: parse
       - name: install patchelf
-        run: apt-get update -y && apt-get install -y patchelf
+        run: sudo apt-get update -y && sudo apt-get install -y patchelf
       - name: setup toolchain
         uses: actions-rs/toolchain@v1
         with:
