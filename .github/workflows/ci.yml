@@ -42,3 +42,7 @@ jobs:
       - name: build
         run: |
           (cd viz ; python3.9 ./setup.py build)
+      - uses: actions/upload-artifact@v2
+        with:
+          name: cli-linux
+          path: viz/dist/cli
