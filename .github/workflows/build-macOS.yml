@@ -3,7 +3,7 @@ name: CI
 on: [push, repository_dispatch]
 
 jobs:
-  build:
+  build_osx:
     runs-on: macOS-latest
     steps:
       - name: Checkout Visualizer
