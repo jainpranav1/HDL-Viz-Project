@@ -6,8 +6,8 @@ from cx_Freeze import setup, Executable
 # "packages": ["os"] is used as example only
 build_exe_options = {
     "packages": ["nand2tetris_hdl_parser"],
-    # "include_files": [("/home/sky/git/nand2tetris-hdl-parser/target/release/libnand2tetris_hdl_parser.so", "lib/nand2tetris_hdl_parser.cpython-39-x86_64-linux-gnu.so")],
-    "include_files": [("parse/target/release/libnand2tetris_hdl_parser.so", "lib/nand2tetris_hdl_parser.cpython-39-x86_64-linux-gnu.so")],
+    "include_files": [("../parse/target/release/libnand2tetris_hdl_parser.so", "lib/nand2tetris_hdl_parser.cpython-39-x86_64-linux-gnu.so")],
+    "build_exe": "dist"
 
 }
 

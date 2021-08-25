@@ -4,30 +4,21 @@ on: [push, repository_dispatch]
 
 jobs:
   build:
-    strategy:
-      fail-fast: false
-      matrix:
-        platform: [ubuntu-latest, macOS-latest, windows-latest]
-        include:
-        - os: macOS-latest
-          TARGET: x86_64-apple-darwin
-        - os: windows-latest
-          TARGET: x86_64-pc-windows-msvc
-        - os: ubuntu-latest
-          TARGET: x86_64-unknown-linux-musl
-    runs-on: ${{ matrix.platform }}
-
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout Visualizer
         uses: actions/checkout@v2
         with:
           path: viz
+          ref: standalone
       - name: Checkout Parser
         uses: actions/checkout@v2
         with:
           repository: tcheinen/nand2tetris-hdl-parser
           ref: pyo3
           path: parse
+      - name: install patchelf
+        run: apt-get update -y && apt-get install -y patchelf
       - name: setup toolchain
         uses: actions-rs/toolchain@v1
         with:
@@ -42,10 +33,12 @@ jobs:
       - name: py-deps
         run: |
           pip install --upgrade pip
-          pip install cffi maturin cx_freeze==6.8b3  
+          pip install cffi maturin cx_freeze==6.8b3
       - name: py-install
         run: |
-          maturin build --manifest-path parse/Cargo.toml --release
+          maturin build --manifest-path parse/Cargo.toml --release --interpreter python3.9
+      - name: install built parser
+        run: pip install ./parse/target/wheels/nand2tetris_hdl_parser-0.1.0-cp39-cp39-manylinux_2_24_x86_64.whl
       - name: build
         run: |
-          ./viz/setup.py build
+          (cd viz ; python3.9 ./setup.py build)
