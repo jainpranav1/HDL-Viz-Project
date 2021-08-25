@@ -10,6 +10,8 @@ def get_include_files():
         return ("../parse/target/release/libnand2tetris_hdl_parser.so", "lib/nand2tetris_hdl_parser.cpython-39-x86_64-linux-gnu.so")
     elif sys.platform == "darwin":
         return ("../parse/target/release/libnand2tetris_hdl_parser.so", "lib/nand2tetris_hdl_parser.cpython-39-darwin.so")
+    elif sys.platform == "win32":
+        return ()
 
 
 build_exe_options = {

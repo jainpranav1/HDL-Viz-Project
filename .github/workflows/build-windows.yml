@@ -3,8 +3,8 @@ name: CI
 on: [push, repository_dispatch]
 
 jobs:
-  build_osx:
-    runs-on: macOS-latest
+  build_ubuntu:
+    runs-on: windows-latest
     steps:
       - name: Checkout Visualizer
         uses: actions/checkout@v2
@@ -17,8 +17,6 @@ jobs:
           repository: tcheinen/nand2tetris-hdl-parser
           ref: pyo3
           path: parse
-      - name: install patchelf
-        run: brew update && brew install patchelf
       - name: setup toolchain
         uses: actions-rs/toolchain@v1
         with:
@@ -37,12 +35,15 @@ jobs:
       - name: py-install
         run: |
           maturin build --manifest-path parse/Cargo.toml --release --interpreter python3.9
+          ls parse/target/wheels
+          ls parse/target/release
       - name: install built parser
-        run: pip install ./parse/target/wheels/nand2tetris_hdl_parser-0.1.0-cp39-cp39-macosx_10_7_x86_64.whl
+        run: pip install ./parse/target/wheels/nand2tetris_hdl_parser-0.1.0-cp39-none-win_amd64.whl
       - name: build
         run: |
-          (cd viz ; python3.9 ./setup.py build)
+          cd viz
+          python3.9 ./setup.py build
       - uses: actions/upload-artifact@v2
         with:
-          name: cli-osx
+          name: cli.exe
           path: viz/dist
