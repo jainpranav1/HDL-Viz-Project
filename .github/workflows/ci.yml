@@ -1,0 +1,51 @@
+name: CI
+
+on: [push, repository_dispatch]
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [ubuntu-latest, macOS-latest, windows-latest]
+        include:
+        - os: macOS-latest
+          TARGET: x86_64-apple-darwin
+        - os: windows-latest
+          TARGET: x86_64-pc-windows-msvc
+        - os: ubuntu-latest
+          TARGET: x86_64-unknown-linux-musl
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - name: Checkout Visualizer
+        uses: actions/checkout@v2
+        with:
+          path: viz
+      - name: Checkout Parser
+        uses: actions/checkout@v2
+        with:
+          repository: tcheinen/nand2tetris-hdl-parser
+          ref: pyo3
+          path: parse
+      - name: setup toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+            profile: minimal
+            toolchain: stable
+            override: true
+            target: ${{matrix.TARGET}}
+      - name: Setup Python environment
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: py-deps
+        run: |
+          pip install --upgrade pip
+          pip install cffi maturin cx_freeze==6.8b3  
+      - name: py-install
+        run: |
+          maturin build --manifest-path parse/Cargo.toml --release
+      - name: build
+        run: |
+          ./viz/setup.py build
