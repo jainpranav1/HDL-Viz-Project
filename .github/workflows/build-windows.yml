@@ -3,7 +3,7 @@ name: CI
 on: [push, repository_dispatch]
 
 jobs:
-  build_ubuntu:
+  build_windows:
     runs-on: windows-latest
     steps:
       - name: Checkout Visualizer
