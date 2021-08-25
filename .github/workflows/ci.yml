@@ -33,7 +33,7 @@ jobs:
       - name: py-deps
         run: |
           pip install --upgrade pip
-          pip install cffi maturin cx_freeze==6.8b3
+          pip install cffi maturin cx_freeze==6.8b3 schemdraw numpy
       - name: py-install
         run: |
           maturin build --manifest-path parse/Cargo.toml --release --interpreter python3.9
