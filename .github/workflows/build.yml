@@ -140,11 +140,14 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: cli-linux
+          path: .
       - uses: actions/download-artifact@v2
         with:
           name: cli-windows
+          path: .
       - uses: actions/download-artifact@v2
         with:
           name: cli-osx
+          path: .
       - name: ls
         run: ls; ls *
