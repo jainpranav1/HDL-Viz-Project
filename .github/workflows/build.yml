@@ -150,5 +150,7 @@ jobs:
         with:
           name: cli-osx
           path: .
-      - name: ls
-        run: ls; ls *
+      - uses: actions/upload-artifact@v2
+        with:
+          name: visualizer
+          path: .
