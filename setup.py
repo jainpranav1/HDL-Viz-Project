@@ -13,6 +13,15 @@ def get_include_files():
     elif sys.platform == "win32":
         return ("../parse/target/release/nand2tetris_hdl_parser.dll", "lib/nand2tetris_hdl_parser.cp39-win_amd64.pyd")
 
+def get_target_name():
+    if sys.platform == "linux":
+        return "visualizer-linux"
+    elif sys.platform == "darwin":
+        return "visualizer-osx"
+    elif sys.platform == "win32":
+        return "visualizer-win"
+
+
 
 build_exe_options = {
     "packages": ["nand2tetris_hdl_parser"],
@@ -25,5 +34,5 @@ setup(
     name = "HDL_Visualizer",
     version = "0.1",
     options = {"build_exe": build_exe_options},
-    executables = [Executable("cli.py")]
+    executables = [Executable(script="cli.py",target_name=get_target_name())]
 )
