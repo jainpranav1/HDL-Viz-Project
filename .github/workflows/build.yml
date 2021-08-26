@@ -41,6 +41,7 @@ jobs:
       - name: build
         run: |
           (cd viz ; python3.9 ./setup.py build)
+          chmod +x viz/dist/visualizer-linux
       - uses: actions/upload-artifact@v2
         with:
           name: cli-linux
@@ -85,6 +86,7 @@ jobs:
       - name: build
         run: |
           (cd viz ; python3.9 ./setup.py build)
+          chmod +x viz/dist/visualizer-osx
       - uses: actions/upload-artifact@v2
         with:
           name: cli-osx
