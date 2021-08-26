@@ -133,7 +133,7 @@ jobs:
           name: cli-windows
           path: viz/dist
       - name: test for 0 return
-        run: viz/dist/visualizer-windows.exe
+        run: viz/dist/visualizer-win.exe
   compile_all:
     runs-on: ubuntu-latest
     needs: [build_ubuntu, build_osx, build_windows]
