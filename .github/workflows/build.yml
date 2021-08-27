@@ -1,0 +1,158 @@
+name: Build
+
+on: [push, repository_dispatch]
+
+jobs:
+  build_ubuntu:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Visualizer
+        uses: actions/checkout@v2
+        with:
+          path: viz
+      - name: Checkout Parser
+        uses: actions/checkout@v2
+        with:
+          repository: tcheinen/nand2tetris-hdl-parser
+          ref: pyo3
+          path: parse
+      - name: install patchelf
+        run: sudo apt-get update -y && sudo apt-get install -y patchelf
+      - name: setup toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+            profile: minimal
+            toolchain: stable
+            override: true
+            target: ${{matrix.TARGET}}
+      - name: Setup Python environment
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: py-deps
+        run: |
+          pip install --upgrade pip
+          pip install cffi maturin cx_freeze==6.8b3 schemdraw numpy
+      - name: py-install
+        run: |
+          maturin build --manifest-path parse/Cargo.toml --release --interpreter python3.9
+      - name: install built parser
+        run: pip install ./parse/target/wheels/nand2tetris_hdl_parser-0.1.0-cp39-cp39-manylinux_2_24_x86_64.whl
+      - name: build
+        run: |
+          (cd viz ; python3.9 ./setup.py build)
+          chmod +x viz/dist/visualizer-linux
+      - uses: actions/upload-artifact@v2
+        with:
+          name: cli-linux
+          path: viz/dist
+      - name: test for 0 return
+        run: viz/dist/visualizer-linux
+  build_osx:
+    runs-on: macOS-latest
+    steps:
+      - name: Checkout Visualizer
+        uses: actions/checkout@v2
+        with:
+          path: viz
+      - name: Checkout Parser
+        uses: actions/checkout@v2
+        with:
+          repository: tcheinen/nand2tetris-hdl-parser
+          ref: pyo3
+          path: parse
+      - name: install patchelf
+        run: brew update && brew install patchelf
+      - name: setup toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+            profile: minimal
+            toolchain: stable
+            override: true
+            target: ${{matrix.TARGET}}
+      - name: Setup Python environment
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: py-deps
+        run: |
+          pip install --upgrade pip
+          pip install cffi maturin cx_freeze==6.8b3 schemdraw numpy
+      - name: py-install
+        run: |
+          maturin build --manifest-path parse/Cargo.toml --release --interpreter python3.9
+      - name: install built parser
+        run: pip install ./parse/target/wheels/nand2tetris_hdl_parser-0.1.0-cp39-cp39-macosx_10_7_x86_64.whl
+      - name: build
+        run: |
+          (cd viz ; python3.9 ./setup.py build)
+          chmod +x viz/dist/visualizer-osx
+      - uses: actions/upload-artifact@v2
+        with:
+          name: cli-osx
+          path: viz/dist
+      - name: test for 0 return
+        run: viz/dist/visualizer-osx
+  build_windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Visualizer
+        uses: actions/checkout@v2
+        with:
+          path: viz
+      - name: Checkout Parser
+        uses: actions/checkout@v2
+        with:
+          repository: tcheinen/nand2tetris-hdl-parser
+          ref: pyo3
+          path: parse
+      - name: setup toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+            profile: minimal
+            toolchain: stable
+            override: true
+            target: ${{matrix.TARGET}}
+      - name: Setup Python environment
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: py-deps
+        run: |
+          pip install --upgrade pip
+          pip install cffi maturin cx_freeze==6.8b3 schemdraw numpy
+      - name: py-install
+        run: |
+          maturin build --manifest-path parse/Cargo.toml --release
+      - name: install built parser
+        run: pip install ./parse/target/wheels/nand2tetris_hdl_parser-0.1.0-cp39-none-win_amd64.whl
+      - name: build
+        run: |
+          cd viz
+          python ./setup.py build
+      - uses: actions/upload-artifact@v2
+        with:
+          name: cli-windows
+          path: viz/dist
+      - name: test for 0 return
+        run: viz/dist/visualizer-win.exe
+  compile_all:
+    runs-on: ubuntu-latest
+    needs: [build_ubuntu, build_osx, build_windows]
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: cli-linux
+          path: .
+      - uses: actions/download-artifact@v2
+        with:
+          name: cli-windows
+          path: .
+      - uses: actions/download-artifact@v2
+        with:
+          name: cli-osx
+          path: .
+      - uses: actions/upload-artifact@v2
+        with:
+          name: visualizer
+          path: .
