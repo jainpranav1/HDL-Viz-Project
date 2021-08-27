@@ -134,7 +134,6 @@ jobs:
           cd viz
           python ./setup.py build
           rm dist/lib/nand2tetris_hdl_parser/python39.dll # idk why this is here
-          # powershell.exe -Command "ls -Filter *.dll -File -Recurse | % {upx.exe $_.fullname}"
       - uses: actions/upload-artifact@v2
         with:
           name: cli-windows
@@ -159,9 +158,8 @@ jobs:
           path: .
       - name: upx magic lol
         run: |
-          upx --version
-          find . -name "*.dll" -exec upx {} \;
-          upx visualizer*
+          upx visualizer-linux
+          upx visualizer-osx
       - uses: actions/upload-artifact@v2
         with:
           name: visualizer
