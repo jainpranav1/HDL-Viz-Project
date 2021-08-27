@@ -42,6 +42,7 @@ jobs:
         run: |
           (cd viz ; python3.9 ./setup.py build)
           chmod +x viz/dist/visualizer-linux
+          find viz/dist/lib -name "*.so" -exec strip {} \;  
       - uses: actions/upload-artifact@v2
         with:
           name: cli-linux
@@ -87,6 +88,7 @@ jobs:
         run: |
           (cd viz ; python3.9 ./setup.py build)
           chmod +x viz/dist/visualizer-osx
+          find viz/dist/lib -name "*.so" -exec strip {} \;  
       - uses: actions/upload-artifact@v2
         with:
           name: cli-osx
