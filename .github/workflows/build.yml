@@ -162,8 +162,8 @@ jobs:
           path: .
       - name: Zip :)
         run: |
-          chmod +x visualizer/visualizer*
-          zip -r visualizer.zip visualizer/*
+          chmod +x visualizer*
+          zip -r visualizer.zip *
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
