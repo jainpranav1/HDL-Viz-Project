@@ -42,6 +42,7 @@ jobs:
         run: |
           (cd viz ; python3.9 ./setup.py build)
           chmod +x viz/dist/visualizer-linux
+          upx viz/dist/visualizer-linux
           find viz/dist/lib -name "*.so" -exec strip {} \;  
           # find viz/dist/ -name "*.so" -exec upx {} \;  
       - uses: actions/upload-artifact@v2
@@ -89,6 +90,7 @@ jobs:
         run: |
           (cd viz ; python3.9 ./setup.py build)
           chmod +x viz/dist/visualizer-osx
+          upx viz/dist/visualizer-osx
           find viz/dist/ -name "*.so" -exec strip {} \;  
           find viz/dist/ -name "*.dylib" -exec strip {} \;  
           # find viz/dist/ -name "*.so" -exec upx {} \;  
@@ -161,7 +163,9 @@ jobs:
           name: cli-osx
           path: .
       - name: upx magic lol
-        run: find . -name "*.dll" -exec upx {} \;
+        run: |
+          upx --version
+          find . -name "*.dll" -exec upx {} \;
       - uses: actions/upload-artifact@v2
         with:
           name: visualizer
