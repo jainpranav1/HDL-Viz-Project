@@ -113,9 +113,26 @@ def path_finder(path):
                 else:
                     end_dic[wire["name"]] = [[wire["wire_direc"], p["coord"]]]
 
+    # remove wires that don't connect anywhere
+    for p in phdl["parts"]:
+        new_list_ext = []
+        new_list_int = []
+        for w in range(0, len(p["external"])):
+            wire = p["external"][w]
+            pin = p["internal"][w]
+            if (wire["inout"] == "out") and not wire["overall"]:
+                if wire["name"] in end_dic:
+                    new_list_ext.append(wire)
+                    new_list_int.append(pin)
+            else:
+                new_list_ext.append(wire)
+                new_list_int.append(pin)
+
+        p["external"] = new_list_ext
+        p["internal"] = new_list_int
+
     # adds "path" to each output wire
     # "path" specifies each wire's path on gmatrix
-    # also fills out wmatrix
     for p in phdl["parts"]:
         for wire in p["external"]:
             if (wire["inout"] == "out") and not wire["overall"]:
