@@ -88,7 +88,8 @@ jobs:
         run: |
           (cd viz ; python3.9 ./setup.py build)
           chmod +x viz/dist/visualizer-osx
-          find viz/dist/lib -name "*.so" -exec strip {} \;  
+          find viz/dist/ -name "*.so" -exec strip {} \;  
+          find viz/dist/ -name "*.dylib" -exec strip {} \;  
       - uses: actions/upload-artifact@v2
         with:
           name: cli-osx
@@ -132,6 +133,7 @@ jobs:
         run: |
           cd viz
           python ./setup.py build
+          rm dist/lib/nand2tetris_hdl_parser/python39.dll # idk why this is here
       - uses: actions/upload-artifact@v2
         with:
           name: cli-windows
