@@ -27,7 +27,7 @@ build_exe_options = {
     "packages": ["nand2tetris_hdl_parser"],
     "include_files": [get_include_files()],
     "build_exe": "dist",
-    "exclude": ["tkinter", "test"]
+    "excludes": ["tkinter", "test"]
 
 }
 
