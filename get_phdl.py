@@ -122,7 +122,7 @@ def get_phdl(path):
         for k in range(0, len(p["external"])):
             if p["external"][k]["inout"] == "in":
                 if not p["custom_pins"]:
-                    if ((p["name"] == "Mux") or (p["name"] == "Dmux")) and (p["internal"][k]["name"] == "sel"):
+                    if ((p["name"] == "Mux") or (p["name"] == "DMux")) and (p["internal"][k]["name"] == "sel"):
                         p["external"][k]["wire_direc"] = "top"
                     else:
                         p["external"][k]["wire_direc"] = "left"
