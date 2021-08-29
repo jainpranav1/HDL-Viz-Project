@@ -1,0 +1,9 @@
+# HDL-Viz-Project
+
+The HDL Visualizer is a tool that allows students to visualize hdl files developed for nand2tetris.
+
+The software can be downloaded here: https://github.com/tcheinen/nand2tetris
+
+Below is a tutorial showing how to use the application (Click the image to be directed to the tutorial).
+
+[![Nand2Tetris Hardware Simulator with HDL Visualizer](https://i.ytimg.com/vi/_Gr781Z-QiM/hqdefault.jpg)](https://www.youtube.com/watch?v=XjMr2jpy7mM)
